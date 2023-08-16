@@ -183,6 +183,66 @@ class YoutubeToSpotify(CreatePlaylist):
         return response_json
 
 
+class SpotifyToWatch2gether(CreatePlaylist):
+    def __init__(self):
+        super().__init__()
+        self.spotify_token = spotify_token
+
+    def get_playlist(self):
+        playlist_url = input('insert playlist url: ')
+        playlist_id = playlist_url[playlist_url.find('list/') + 5: playlist_url.find('?')]
+
+        query = 'https://api.spotify.com/v1/playlists/{}/tracks'.format(playlist_id)
+
+        response = requests.get(
+            query,
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer {}'.format(self.spotify_token)
+            }
+
+        )
+        for i, song in enumerate(response.json()['items']):
+            self.list_song_info['track {}'.format(i + 1)] = {
+                'track': song['track']['name'],
+                'artist': song['track']['artists'][0]['name']
+                # TODO try to put multiple artists
+
+            }
+
+
+
+    def create_playlist(self) -> str:
+        # TODO CURRENT ASSUMPTION: CREATE PLAYLIST RETURNS STREAMKEY
+        pass
+
+
+    def add_songs_to_playlist(self):
+        # streamkey = self.create_playlist()
+        # self.list_song_info = {
+        #     "url": "https://www.youtube.com/watch?v=dMH0bHeiRNg",
+        #     "title": "Hello World"}
+        #
+        # request_body = json.dumps({
+        #     'w2g_api_key': placeholdertxt,  # TODO api key variable
+        #     'add_items': [info for song, info in self.list_song_info.items()]
+        # })
+        #
+        # query = "https://api.w2g.tv/rooms/{}/playlists/current/playlist_items/sync_update".format(
+        #     streamkey)
+        #
+        # response = requests.post(
+        #     query,
+        #     data=request_body,
+        #     headers={
+        #         'Accept': 'application/json',
+        #         'Content-Type': 'application/json'
+        #     })
+
+
 if __name__ == '__main__':
-    playlist_transfer = YoutubeToSpotify()
-    playlist_transfer.add_songs_to_playlist()
+    # playlist_transfer = YoutubeToSpotify()
+    # playlist_transfer.add_songs_to_playlist()
+
+    playlist_transfer = SpotifyToWatch2gether()
+    playlist_transfer.get_playlist()
